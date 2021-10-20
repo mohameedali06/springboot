@@ -1,0 +1,138 @@
+//service package
+//car class
+package com.example.cardemo.Service;
+
+public class Car {
+    public int num;
+    public String name;
+    public String model;
+
+    public Car(int num, String name, String model) {
+        this.num = num;
+        this.name = name;
+        this.model = model;
+    }
+
+    public int getNum() {
+        return num;
+    }
+
+    public void setNum(int num) {
+        this.num = num;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+
+}
+------------------------------------------------------------------------------------------------
+//myservice class
+package com.example.cardemo.Service;
+import java.util.ArrayList;
+import java.util.List;
+    public class MyServices implements MyServicesInterface{
+        List<Car> list = new ArrayList<Car>();
+        public MyServices(){
+            this.list.add(new Car(1001,"mahindra","xuv"));
+            this.list.add(new Car(1002,"tata","altroz"));
+
+        }
+    @Override
+    public List<Car> getcar() {
+        return list;
+    }
+    @Override
+    public Car addcars(Car car) {
+            this.list.add(car);
+            return car;
+    }
+    @Override
+    public Car getnum(int num)
+    {
+        for (Car car:this.list)
+        {
+            if(car.getNum()==num)
+            {
+                return car;
+            }
+        }
+        return null;
+    }
+}
+--------------------------------------------------------------------------------------------------------
+//myserviceinterface
+
+package com.example.cardemo.Service;
+
+import java.util.List;
+
+public interface MyServicesInterface {
+    public List<Car> getcar();
+    public Car addcars(Car car);
+    public Car getnum(int num);
+
+}
+------------------------------------------------------------------------------------------------------------
+//config package
+//config class
+package com.example.cardemo.Config;
+
+import com.example.cardemo.Service.MyServices;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class Config {
+    @Bean
+    public MyServices myservices()
+    {
+        return new MyServices();
+    }
+}
+-------------------------------------------------------------------------------------------------------------
+//controller package
+//controller class
+package com.example.cardemo.Controller;
+
+import com.example.cardemo.Service.Car;
+import com.example.cardemo.Service.MyServices;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+public class Controller {
+    @Autowired
+    MyServices myservices;
+
+    @GetMapping("car")
+    public List<Car> Cars() {
+        return myservices.getcar();
+    }
+
+    @PostMapping("addcar")
+    public Car addcar(@RequestBody Car car) {
+        return myservices.addcars(car);
+
+    }
+
+    @GetMapping("carbynum")
+    public Car getnum(@RequestParam("num") int num) {
+        return (Car) myservices.getnum(num);
+    }
+}
